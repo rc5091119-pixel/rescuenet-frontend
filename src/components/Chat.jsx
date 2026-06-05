@@ -7,14 +7,30 @@ function Chat() {
   const [roomInfo, setRoomInfo] = useState(null);
   const [messages, setMessages] = useState([]);
   const [content, setContent] = useState("");
-
+  const [locationName, setLocationName] = useState("");
   const wsRef = useRef(null);
   const messagesEndRef = useRef(null);
+
+  async function getLocationName(lat, lng) {
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+      );
+
+      const data = await response.json();
+
+      console.log("Location Data:", data);
+
+      setLocationName(data.display_name);
+    } catch (err) {
+      console.error("Location lookup failed:", err);
+    }
+  }
 
   useEffect(() => {
     fetchRoomInfo();
     fetchMessages();
-
+    
     const token = localStorage.getItem("token");
 
     const ws = new WebSocket(
@@ -45,10 +61,10 @@ function Chat() {
   }, [roomID]);
 
   useEffect(() => {
-  messagesEndRef.current?.scrollIntoView({
-    behavior: "smooth",
-  });
-}, [messages]);
+    messagesEndRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
+  }, [messages]);
 
   async function fetchRoomInfo() {
     const token = localStorage.getItem("token");
@@ -65,9 +81,14 @@ function Chat() {
 
       const data = await response.json();
 
-      console.log("Room Info:", data);
+console.log("Room Info:", data);
 
-      setRoomInfo(data);
+setRoomInfo(data);
+
+getLocationName(
+  data.Latitude,
+  data.Longitude
+);
     } catch (err) {
       console.error("Failed to fetch room info:", err);
     }
@@ -144,68 +165,86 @@ function Chat() {
 
         <p>
           <strong>📍 Alert Location:</strong>{" "}
-          {roomInfo
-            ? `${roomInfo.Latitude}, ${roomInfo.Longitude}`
-            : "Loading..."}
+          {locationName || "Loading location..."}
         </p>
+        <button
+          onClick={() =>
+            window.open(
+              `https://www.google.com/maps/dir/?api=1&destination=${roomInfo.Latitude},${roomInfo.Longitude}`,
+              "_blank"
+            )
+          }
+          style={{
+            marginTop: "10px",
+            padding: "10px 18px",
+            border: "none",
+            borderRadius: "8px",
+            backgroundColor: "#2563eb",
+            color: "white",
+            cursor: "pointer",
+            fontWeight: "bold",
+          }}
+        >
+          🧭 Navigate
+        </button>
       </div>
 
-      <div
-       style={{
-  height: "500px",
-  overflowY: "auto",
-  padding: "20px",
-  marginBottom: "15px",
-  borderRadius: "12px",
-  backgroundColor: "#f8fafc",
-  border: "1px solid #e2e8f0",
-}}
-      >
-        {messages.map((msg) => {
-  const isMine =
-    msg.SenderID === currentUserID ||
-    msg.SenderName?.String === "Me";
-
-  return (
-    <div
-      key={msg.ID}
-      style={{
-        display: "flex",
-        justifyContent: isMine ? "flex-end" : "flex-start",
-        marginBottom: "12px",
-      }}
-    >
       <div
         style={{
-          maxWidth: "60%",
-          minWidth: "120px",
-          backgroundColor: isMine ? "#2563eb" : "#f1f5f9",
-          color: isMine ? "white" : "black",
-          padding: "10px 14px",
-          borderRadius: "14px",
-          boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+          height: "500px",
+          overflowY: "auto",
+          padding: "20px",
+          marginBottom: "15px",
+          borderRadius: "12px",
+          backgroundColor: "#f8fafc",
+          border: "1px solid #e2e8f0",
         }}
       >
-        {!isMine && (
-          <div
-            style={{
-              fontSize: "12px",
-              fontWeight: "bold",
-              marginBottom: "4px",
-            }}
-          >
-            {msg.SenderName?.Valid
-              ? msg.SenderName.String
-              : "Unknown User"}
-          </div>
-        )}
+        {messages.map((msg) => {
+          const isMine =
+            msg.SenderID === currentUserID ||
+            msg.SenderName?.String === "Me";
 
-        <div>{msg.Content}</div>
-      </div>
-    </div>
-  );
-})}
-        
+          return (
+            <div
+              key={msg.ID}
+              style={{
+                display: "flex",
+                justifyContent: isMine ? "flex-end" : "flex-start",
+                marginBottom: "12px",
+              }}
+            >
+              <div
+                style={{
+                  maxWidth: "60%",
+                  minWidth: "120px",
+                  backgroundColor: isMine ? "#2563eb" : "#f1f5f9",
+                  color: isMine ? "white" : "black",
+                  padding: "10px 14px",
+                  borderRadius: "14px",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+                }}
+              >
+                {!isMine && (
+                  <div
+                    style={{
+                      fontSize: "12px",
+                      fontWeight: "bold",
+                      marginBottom: "4px",
+                    }}
+                  >
+                    {msg.SenderName?.Valid
+                      ? msg.SenderName.String
+                      : "Unknown User"}
+                  </div>
+                )}
+
+                <div>{msg.Content}</div>
+              </div>
+            </div>
+          );
+        })}
+
         <div ref={messagesEndRef}></div>
       </div>
 

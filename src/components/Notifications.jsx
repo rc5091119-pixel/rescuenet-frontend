@@ -23,6 +23,8 @@ function Notifications() {
 
       const data = await response.json();
 
+      console.log("Notifications:", data);
+
       setNotifications(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error(err);
@@ -131,33 +133,55 @@ function Notifications() {
               {notification.Status}
             </p>
 
-            <button
-              disabled={
-                notification.Status === "accepted"
-              }
-              onClick={() =>
-                acceptAlert(notification.AlertID)
-              }
+            <div
               style={{
+                display: "flex",
+                gap: "10px",
                 marginTop: "10px",
-                padding: "12px 20px",
-                border: "none",
-                borderRadius: "10px",
-                backgroundColor:
-                  notification.Status ===
-                  "accepted"
-                    ? "#94a3b8"
-                    : "#16a34a",
-                color: "white",
-                fontWeight: "bold",
-                cursor: "pointer",
               }}
             >
-              {notification.Status ===
-              "accepted"
-                ? "✅ Accepted"
-                : "Accept Alert"}
-            </button>
+              <button
+                disabled={
+                  notification.Status === "accepted"
+                }
+                onClick={() =>
+                  acceptAlert(notification.AlertID)
+                }
+                style={{
+                  padding: "12px 20px",
+                  border: "none",
+                  borderRadius: "10px",
+                  backgroundColor:
+                    notification.Status === "accepted"
+                      ? "#94a3b8"
+                      : "#16a34a",
+                  color: "white",
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                }}
+              >
+                {notification.Status === "accepted"
+                  ? "✅ Accepted"
+                  : "Accept Alert"}
+              </button>
+
+              <button
+                onClick={() =>
+                  console.log(notification)
+                }
+                style={{
+                  padding: "12px 20px",
+                  border: "none",
+                  borderRadius: "10px",
+                  backgroundColor: "#2563eb",
+                  color: "white",
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                }}
+              >
+                🧭 Navigate
+              </button>
+            </div>
           </div>
         ))
       )}
