@@ -1,9 +1,44 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Location() {
-  const [lat, setLat] = useState("");
-  const [lng, setLng] = useState("");
+  const navigate = useNavigate();
+  const [lat, setLat] = useState(null);
+  const [lng, setLng] = useState(null);
+  const [locationName, setLocationName] = useState("");
   const [loading, setLoading] = useState(false);
+
+  async function detectLocation() {
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+
+        setLat(latitude);
+        setLng(longitude);
+
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+          );
+
+          const data = await response.json();
+
+          setLocationName(
+            data.display_name || "Location detected"
+          );
+        } catch (err) {
+          console.log(err);
+        }
+      },
+      (err) => {
+        console.log(err);
+        alert(
+          "Please allow location access to use RescueNet."
+        );
+      }
+    );
+  }
 
   async function handleLocation() {
     const token = localStorage.getItem("token");
@@ -25,12 +60,17 @@ function Location() {
           }),
         }
       );
+      if (!response.ok) {
+        throw new Error("Location update failed");
+      }
 
       const data = await response.json();
 
       console.log(data);
-
+      
       alert("📍 Location Updated!");
+
+      navigate("/dashboard");
     } catch (err) {
       console.error(err);
       alert("Location Update Failed");
@@ -38,6 +78,9 @@ function Location() {
       setLoading(false);
     }
   }
+  useEffect(() => {
+    detectLocation();
+  }, []);
 
   return (
     <div
@@ -79,39 +122,39 @@ function Location() {
           emergency alerts can reach you.
         </p>
 
-        <input
-          type="number"
-          placeholder="Latitude"
-          value={lat}
-          onChange={(e) => setLat(e.target.value)}
+        <div
           style={{
-            width: "100%",
-            padding: "12px",
-            marginBottom: "15px",
+            background: "#f1f5f9",
+            padding: "15px",
             borderRadius: "10px",
-            border: "1px solid #cbd5e1",
-            boxSizing: "border-box",
-          }}
-        />
-
-        <input
-          type="number"
-          placeholder="Longitude"
-          value={lng}
-          onChange={(e) => setLng(e.target.value)}
-          style={{
-            width: "100%",
-            padding: "12px",
             marginBottom: "20px",
-            borderRadius: "10px",
-            border: "1px solid #cbd5e1",
-            boxSizing: "border-box",
           }}
-        />
+        >
+          <strong>Current Location:</strong>
+
+          <p>{locationName || "Detecting location..."}</p>
+        </div>
+
+        <button
+          onClick={detectLocation}
+          style={{
+            width: "100%",
+            padding: "12px",
+            marginBottom: "10px",
+            borderRadius: "10px",
+            border: "1px solid #2563eb",
+            background: "white",
+            color: "#2563eb",
+            cursor: "pointer",
+          }}
+        >
+          📍 Detect Again
+        </button>
+
 
         <button
           onClick={handleLocation}
-          disabled={loading}
+          disabled={loading || lat === null || lng === null}
           style={{
             width: "100%",
             padding: "14px",

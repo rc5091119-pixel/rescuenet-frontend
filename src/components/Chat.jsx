@@ -9,7 +9,10 @@ function Chat() {
   const [content, setContent] = useState("");
   const [responders, setResponders] = useState([]);
   const [locationName, setLocationName] = useState("");
+  const [victimLocation, setVictimLocation] =
+    useState(null);
   const wsRef = useRef(null);
+  const locationIntervalRef = useRef(null);
   const messagesEndRef = useRef(null);
 
   async function fetchResponders() {
@@ -37,12 +40,10 @@ function Chat() {
 
       const data = await response.json();
 
-      console.log("Location Data:", data);
+      console.log("Location Data Full:", JSON.stringify(data, null, 2));
 
       setLocationName(
-        `${data.address.suburb || ""}
-       ${data.address.city || data.address.town || ""}
-       ${data.address.state || ""}`
+        data.display_name
       );
     } catch (err) {
       console.error("Location lookup failed:", err);
@@ -62,22 +63,47 @@ function Chat() {
     wsRef.current = ws;
 
     ws.onopen = () => {
+      locationIntervalRef.current = setInterval(() => {
+
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+
+            if (!wsRef.current) return;
+
+            wsRef.current.send(
+              JSON.stringify({
+                type: "location",
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude,
+              })
+            );
+
+          },
+          (err) => console.log(err)
+        );
+
+      }, 10000);
       console.log("WebSocket Connected");
     };
 
     ws.onmessage = (event) => {
       const msg = JSON.parse(event.data);
 
-      console.log("WS Message:", msg);
-
-      setMessages((prev) => [...prev, msg]);
+      if (msg.type === "location") {
+        setVictimLocation({
+          latitude: msg.latitude,
+          longitude: msg.longitude,
+        });
+      } else {
+        setMessages((prev) => [...prev, msg]);
+      }
     };
-
     ws.onclose = () => {
       console.log("WebSocket Closed");
     };
 
     return () => {
+      clearInterval(locationIntervalRef.current);
       ws.close();
     };
   }, [roomID]);
@@ -146,7 +172,12 @@ function Chat() {
 
     const text = content;
 
-    wsRef.current.send(text);
+    wsRef.current.send(
+      JSON.stringify({
+        type: "chat",
+        content: text,
+      })
+    );
 
     setMessages((prev) => [
       ...prev,
