@@ -121,14 +121,24 @@ function Notifications() {
               🚨 Emergency Alert
             </h3>
 
-            <p>
+            <p
+              style={{
+                color: "#111827",
+                marginBottom: "8px",
+              }}
+            >
               <strong>Created By:</strong>{" "}
               {notification.CreatorName?.Valid
                 ? notification.CreatorName.String
                 : "Unknown User"}
             </p>
 
-            <p>
+            <p
+              style={{
+                color: "#111827",
+                marginBottom: "8px",
+              }}
+            >
               <strong>Status:</strong>{" "}
               {notification.Status}
             </p>

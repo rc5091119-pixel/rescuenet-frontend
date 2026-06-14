@@ -112,18 +112,23 @@ function Rooms() {
               border: "1px solid #e2e8f0",
             }}
           >
-            <h3 style={{ marginTop: 0 }}>
+            <h3
+              style={{
+                marginTop: 0,
+                color: "#111827",
+              }}
+            >
               🚑 Rescue Group
             </h3>
 
-            <p>
+            <p style={{ color: "#111827" }}>
               <strong>Created By:</strong>{" "}
               {room.CreatorName?.Valid
                 ? room.CreatorName.String
                 : "Unknown"}
             </p>
 
-            <p>
+            <p style={{ color: "#111827" }}>
               <strong>📍 Location:</strong>{" "}
               {locationNames[room.RoomID] ||
                 "Loading location..."}
