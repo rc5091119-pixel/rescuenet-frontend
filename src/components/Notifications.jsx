@@ -13,7 +13,7 @@ function Notifications() {
 
     try {
       const response = await fetch(
-        "http://localhost:8080/api/notifications",
+        "https://rescuenet-g41t.onrender.com/api/notifications",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -39,7 +39,7 @@ function Notifications() {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/alerts/${alertID}/accept`,
+        `https://rescuenet-g41t.onrender.com/api/alerts/${alertID}/accept`,
         {
           method: "POST",
           headers: {

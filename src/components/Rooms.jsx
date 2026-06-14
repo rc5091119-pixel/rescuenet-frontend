@@ -38,7 +38,7 @@ function Rooms() {
 
     try {
       const response = await fetch(
-        "http://localhost:8080/api/my-rooms",
+        "https://rescuenet-g41t.onrender.com/api/my-rooms",
         {
           headers: {
             Authorization: `Bearer ${token}`,

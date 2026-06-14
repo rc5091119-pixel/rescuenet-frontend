@@ -106,7 +106,7 @@ export default function Chat() {
   async function fetchResponders() {
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch(`http://localhost:8080/api/rooms/${roomID}/locations`, {
+      const res = await fetch(`https://rescuenet-g41t.onrender.com/api/rooms/${roomID}/locations`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -132,7 +132,7 @@ export default function Chat() {
   async function fetchRoomInfo() {
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch(`http://localhost:8080/api/rooms/${roomID}/info`, {
+      const res = await fetch(`https://rescuenet-g41t.onrender.com/api/rooms/${roomID}/info`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -146,7 +146,7 @@ export default function Chat() {
   async function fetchMessages() {
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch(`http://localhost:8080/api/rooms/${roomID}/messages`, {
+      const res = await fetch(`https://rescuenet-g41t.onrender.com/api/rooms/${roomID}/messages`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -164,7 +164,9 @@ export default function Chat() {
     fetchResponders();
 
     const token = localStorage.getItem("token");
-    const ws = new WebSocket(`ws://localhost:8080/ws/rooms/${roomID}?token=${token}`);
+    const ws = new WebSocket(
+      `wss://rescuenet-g41t.onrender.com/ws/rooms/${roomID}?token=${token}`
+    );
     wsRef.current = ws;
 
     ws.onopen = () => {

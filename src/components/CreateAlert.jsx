@@ -11,7 +11,7 @@ function CreateAlert() {
 
     try {
       const response = await fetch(
-        "http://localhost:8080/api/alerts",
+        "https://rescuenet-g41t.onrender.com/api/alerts",
         {
           method: "POST",
           headers: {

@@ -10,7 +10,7 @@ function Register() {
   async function handleRegister() {
     try {
       const response = await fetch(
-        "http://localhost:8080/api/users",
+        "https://rescuenet-g41t.onrender.com/api/users",
         {
           method: "POST",
           headers: {

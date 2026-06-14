@@ -47,7 +47,7 @@ function Location() {
 
     try {
       const response = await fetch(
-        "http://localhost:8080/api/location",
+        "https://rescuenet-g41t.onrender.com/api/location",
         {
           method: "POST",
           headers: {
