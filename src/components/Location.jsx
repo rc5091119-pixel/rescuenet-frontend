@@ -24,8 +24,10 @@ function Location() {
 
           const data = await response.json();
 
+          const address = data.address;
+
           setLocationName(
-            data.display_name || "Location detected"
+            `${address.suburb || ""}, ${address.city || address.town || ""}, ${address.state || ""}`
           );
         } catch (err) {
           console.log(err);
@@ -67,7 +69,7 @@ function Location() {
       const data = await response.json();
 
       console.log(data);
-      
+
       alert("📍 Location Updated!");
 
       navigate("/dashboard");
@@ -128,11 +130,23 @@ function Location() {
             padding: "15px",
             borderRadius: "10px",
             marginBottom: "20px",
+            maxHeight: "150px",
+            overflowY: "auto",
           }}
         >
           <strong>Current Location:</strong>
 
-          <p>{locationName || "Detecting location..."}</p>
+          <p
+            style={{
+              wordBreak: "break-word",
+              overflowWrap: "break-word",
+              whiteSpace: "normal",
+              lineHeight: "1.5",
+              color: "#111827",
+            }}
+          >
+            {locationName || "Detecting location..."}
+          </p>
         </div>
 
         <button
